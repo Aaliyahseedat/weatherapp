@@ -2,13 +2,13 @@
 series_titles = ["Maximum temperature (Degree C)", "Minimum temperature (Degree C)", "Rainfall amount (millimetres)"]
 
 def mean(in_series):
-    pass
+   pass
 
 def variance(in_series):
-    pass
+   pass
 
 def standard_deviation(in_series):
-    pass
+   return variance(in_series) ** 0.5
 
 def filter_series(year_series, month_series, day_series, data_series, max_date=None, min_date=None):
     pass
