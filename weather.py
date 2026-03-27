@@ -1,5 +1,5 @@
 
-series_titles = ["Maximum temperature (Degree C)", "Minimum temperature (Degree C)", "Rainfall amount (millimetres)"]
+series_titles = ["Maximum temperature (Degree C)", "Minimum temperature (Degree C)", "Rainfall amount (millimetres)", "Temperature range (Degree C)"]
 
 calculation_options = [
     "Mean",
@@ -78,18 +78,38 @@ def interquartile_range(in_series):
 
     return Q3 - Q1
 
+def temperature_range_series(max_series, min_series):
+    result = []
+
+    for index in range(len(max_series)):
+        max_value = max_series[index]
+        min_value = min_series[index]
+
+        if max_value is None or min_value is None:
+            result.append(None)
+        else:
+            result.append(max_value - min_value)
+
+    return result
+    
+
 def filter_series(date_series, data_series, min_date=None, max_date=None):
     filtered = []
 
-    for date, value in zip(date_series, data_series):
+    for index in range(len(data_series)):
+        date = date_series[index]
+        value = data_series[index]
+
         if value is None:
             continue
 
-        if min_date and date < min_date:
-            continue
+        if min_date is not None:
+            if date < min_date:
+                continue
 
-        if max_date and date > max_date:
-            continue
+        if max_date is not None:
+            if date > max_date:
+                continue
 
         filtered.append(value)
 
@@ -140,6 +160,7 @@ def get_date_range():
 
     if min_date == "":
         min_date = None
+
     if max_date == "":
         max_date = None
 
@@ -161,41 +182,50 @@ def menu(data_table):
     print("Select a data series:")
     choice = get_user_choice(series_titles)
 
-    series = data_table[choice]
+    if choice is None:
+        return
+    
+    if choice == "Temperature range (Degree C)":
+        max_series = data_table["Maximum temperature (Degree C)"]
+        min_series = data_table["Minimum temperature (Degree C)"]
+        series = temperature_range_series(max_series, min_series)
+    else:
+        series = data_table[choice]
+        
     dates = data_table["Date"]
 
-    # 👇 NEW: get date range
     min_date, max_date = get_date_range()
 
-    # 👇 NEW: filter data
-    if min_date or max_date:
+    if min_date is not None or max_date is not None:
         series = filter_series(dates, series, min_date, max_date)
+
+    if len(series) == 0:
+        print("No data found in that date range.")
+        return
 
     print("\nSelect a calculation:")
     calc_choice = get_user_choice(calculation_options)
 
+    if calc_choice is None:
+        return
+
     if calc_choice == "Mean":
         result = mean(series)
-
     elif calc_choice == "Variance":
         result = variance(series)
-
     elif calc_choice == "Standard Deviation":
         result = standard_deviation(series)
-
     elif calc_choice == "Range":
         result = series_range(series)
-
     elif calc_choice == "Interquartile Range (IQR)":
         result = interquartile_range(series)
-
     else:
         print("Invalid choice")
         return
 
     print(f"{calc_choice}: {result}")
-    
+
+
 if __name__ == "__main__":
-    data = read_csv('weather_tidier.csv')
+    data = read_csv("weather_tidier.csv")
     menu(data)
-    
