@@ -3,6 +3,18 @@ series_titles = ["Maximum temperature (Degree C)", "Minimum temperature (Degree 
 
 def mean(in_series):
    pass
+    total = 0
+    count = 0
+
+    for value in in_series:
+        if value is not None:   # skip missing values
+            total += value
+            count += 1
+
+    if count == 0:
+        return None
+
+    return total / count
 
 def variance(in_series):
    pass
